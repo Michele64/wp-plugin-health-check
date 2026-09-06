@@ -2,9 +2,9 @@
 Contributors: michelechesi
 Tags: plugins, wartung, sicherheit, updates
 Requires at least: 6.0
-Tested up to: 7.1
+Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,7 +24,7 @@ Die Ergebnisse erscheinen direkt als zusätzliche Spalte in der normalen Plugin-
 
 == Installation ==
 
-1. Die aktuelle ZIP-Datei aus dem [GitHub-Repository](https://github.com/Michele64/wp-plugin-health-check/releases) herunterladen
+1. Die aktuelle ZIP-Datei aus dem [GitHub-Repository](https://github.com/dein-github-user/wp-plugin-health-check/releases) herunterladen
 2. Unter **Plugins → Installieren → Plugin hochladen** hochladen, oder in `wp-content/plugins/` entpacken
 3. Plugin aktivieren
 
@@ -35,4 +35,4 @@ Updates werden automatisch über das GitHub-Repository bezogen, kein zusätzlich
 = 1.1.2 =
 * Aktueller Stand
 
-Ältere Versionshinweise sind im [GitHub-Commit-Verlauf](https://github.com/Michele64/wp-plugin-health-check/commits/main) nachvollziehbar.
+Ältere Versionshinweise sind im [GitHub-Commit-Verlauf](https://github.com/dein-github-user/wp-plugin-health-check/commits/main) nachvollziehbar.

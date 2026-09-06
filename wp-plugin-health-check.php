@@ -3,7 +3,7 @@
  * Plugin Name:       Plugin-Zustandsprüfung
  * Plugin URI:        https://chesi.net/
  * Description:       Prüft alle installierten Plugins gegen das WordPress.org-Verzeichnis und meldet geschlossene, verwaiste oder lange nicht mehr gepflegte Plugins.
- * Version:           1.1.2
+ * Version:           1.1.3
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Michele Chesi
@@ -22,7 +22,7 @@ if ( file_exists( __DIR__ . '/vendor/plugin-update-checker/plugin-update-checker
 	require_once __DIR__ . '/vendor/plugin-update-checker/plugin-update-checker.php';
 
 	YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
-		'https://github.com/Michele64/wp-plugin-health-check/',
+		'https://github.com/dein-github-user/wp-plugin-health-check/',
 		__FILE__,
 		'wp-plugin-health-check'
 	);
@@ -30,7 +30,6 @@ if ( file_exists( __DIR__ . '/vendor/plugin-update-checker/plugin-update-checker
 
 final class PZP_Plugin_Health {
 
-	const VERSION   = '1.1.2';
 	const TRANSIENT = 'pzp_report';
 	const OPTION    = 'pzp_settings';
 	const CRON_HOOK = 'pzp_weekly_scan';
@@ -49,6 +48,21 @@ final class PZP_Plugin_Health {
 			self::$instance = new self();
 		}
 		return self::$instance;
+	}
+
+	/**
+	 * Liest die Versionsnummer direkt aus dem Plugin-Header, statt sie ein
+	 * zweites Mal fest im Code zu hinterlegen — so gibt es nur noch eine
+	 * Stelle (den Header) plus die readme.txt, die bei einem Release
+	 * synchron gehalten werden müssen.
+	 */
+	public static function version() {
+		static $version = null;
+		if ( null === $version ) {
+			$data    = get_file_data( __FILE__, array( 'Version' => 'Version' ) );
+			$version = $data['Version'];
+		}
+		return $version;
 	}
 
 	private function __construct() {
