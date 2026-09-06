@@ -22,7 +22,7 @@ if ( file_exists( __DIR__ . '/vendor/plugin-update-checker/plugin-update-checker
 	require_once __DIR__ . '/vendor/plugin-update-checker/plugin-update-checker.php';
 
 	YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
-		'https://github.com/Michele64/wp-plugin-health-check/',
+		'https://github.com/dein-github-user/wp-plugin-health-check/',
 		__FILE__,
 		'wp-plugin-health-check'
 	);
