@@ -4,7 +4,7 @@ Tags: plugins, wartung, sicherheit, updates
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.5
+Stable tag: 1.1.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,6 +31,9 @@ Die Ergebnisse erscheinen direkt als zusätzliche Spalte in der normalen Plugin-
 Updates werden automatisch über das GitHub-Repository bezogen, kein zusätzlicher Update-Server nötig.
 
 == Changelog ==
+
+= 1.1.6 =
+* Optionale GitHub-Authentifizierung für den Update-Checker ergänzt (Konstante WPHC_GITHUB_TOKEN in wp-config.php), um 403-Fehler durch GitHub-Rate-Limiting bzw. IP-basierte Abuse-Detection bei Shared Hosting zu vermeiden
 
 = 1.1.5 =
 * E-Mail-Benachrichtigung ist jetzt standardmäßig aktiviert (galt zuvor: deaktiviert)

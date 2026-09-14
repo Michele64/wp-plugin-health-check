@@ -3,7 +3,7 @@
  * Plugin Name:       Plugin-Zustandsprüfung
  * Plugin URI:        https://chesi.net/
  * Description:       Prüft alle installierten Plugins gegen das WordPress.org-Verzeichnis und meldet geschlossene, verwaiste oder lange nicht mehr gepflegte Plugins.
- * Version:           1.1.5
+ * Version:           1.1.6
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Michele Chesi
@@ -21,11 +21,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( file_exists( __DIR__ . '/vendor/plugin-update-checker/plugin-update-checker.php' ) ) {
 	require_once __DIR__ . '/vendor/plugin-update-checker/plugin-update-checker.php';
 
-	YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
+	$pzp_update_checker = YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
 		'https://github.com/Michele64/wp-plugin-health-check/',
 		__FILE__,
 		'wp-plugin-health-check'
 	);
+
+	// Optionales GitHub-Token gegen 403-Fehler (Rate-Limit/Abuse-Detection bei
+	// Shared-Hosting-IPs). Token je Seite über wp-config.php-Konstante setzen:
+	// define( 'WPHC_GITHUB_TOKEN', 'github_pat_...' );
+	if ( defined( 'WPHC_GITHUB_TOKEN' ) && WPHC_GITHUB_TOKEN ) {
+		$pzp_update_checker->setAuthentication( WPHC_GITHUB_TOKEN );
+	}
 }
 
 final class PZP_Plugin_Health {
