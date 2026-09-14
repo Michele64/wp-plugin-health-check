@@ -32,7 +32,16 @@ Updates werden automatisch über das GitHub-Repository bezogen, kein zusätzlich
 
 == Changelog ==
 
-= 1.1.2 =
-* Aktueller Stand
+= 1.1.4 =
+* Standard für E-Mail-Benachrichtigungshäufigkeit auf "monatlich" geändert (galt zuvor: "wöchentlich")
 
-Ältere Versionshinweise sind im [GitHub-Commit-Verlauf](https://github.com/Michele64/wp-plugin-health-check/commits/main) nachvollziehbar.
+= 1.1.3 =
+* Versionsnummer wird jetzt dynamisch aus dem Plugin-Header gelesen, statt zusätzlich fest im Code zu stehen
+* "Tested up to" auf 7.1 aktualisiert
+
+= 1.1.2 =
+* Erster Release über das öffentliche GitHub-Repo mit automatischen Updates (Plugin Update Checker)
+* Mehrsprachigkeit vorbereitet: alle sichtbaren Texte über die Text Domain "wp-plugin-health-check" übersetzbar gemacht
+* README.md und readme.txt ergänzt
+
+Frühere Versionshinweise (vor dem Umzug auf GitHub) sind nicht mehr im Detail dokumentiert. Ältere Commits sind im [GitHub-Commit-Verlauf](https://github.com/Michele64/wp-plugin-health-check/commits/main) nachvollziehbar.
