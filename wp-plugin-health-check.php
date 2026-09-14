@@ -3,7 +3,7 @@
  * Plugin Name:       Plugin-Zustandsprüfung
  * Plugin URI:        https://chesi.net/
  * Description:       Prüft alle installierten Plugins gegen das WordPress.org-Verzeichnis und meldet geschlossene, verwaiste oder lange nicht mehr gepflegte Plugins.
- * Version:           1.1.4
+ * Version:           1.1.5
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Michele Chesi
@@ -127,7 +127,7 @@ final class PZP_Plugin_Health {
 		$defaults = array(
 			'stale_months'  => 24,
 			'notice_months' => 12,
-			'email_notify'    => 0,
+			'email_notify'    => 1,
 			'email_frequency' => 'monthly',
 			'email_to'        => get_option( 'admin_email' ),
 		);
@@ -716,6 +716,18 @@ final class PZP_Plugin_Health {
 	 * Activation / Deactivation
 	 * ------------------------------------------------------------------ */
 
+	/**
+	 * Richtet den Cron gleich bei der Aktivierung passend zu den (Standard-)
+	 * Einstellungen ein. Ohne das bliebe "email_notify" per Default zwar auf
+	 * 1 gesetzt, der eigentliche Cron würde aber erst beim ersten manuellen
+	 * Speichern der Einstellungsseite geplant — der Haken wäre also bei einer
+	 * frischen Installation angehakt, ohne dass tatsächlich etwas läuft.
+	 */
+	public static function activate() {
+		$instance = self::instance();
+		$instance->sync_cron( $instance->settings() );
+	}
+
 	public static function deactivate() {
 		$scheduled = wp_next_scheduled( self::CRON_HOOK );
 		if ( $scheduled ) {
@@ -725,6 +737,7 @@ final class PZP_Plugin_Health {
 	}
 }
 
+register_activation_hook( __FILE__, array( 'PZP_Plugin_Health', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'PZP_Plugin_Health', 'deactivate' ) );
 
 add_action( 'plugins_loaded', array( 'PZP_Plugin_Health', 'instance' ) );
