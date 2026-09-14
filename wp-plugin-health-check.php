@@ -3,7 +3,7 @@
  * Plugin Name:       Plugin-Zustandsprüfung
  * Plugin URI:        https://chesi.net/
  * Description:       Prüft alle installierten Plugins gegen das WordPress.org-Verzeichnis und meldet geschlossene, verwaiste oder lange nicht mehr gepflegte Plugins.
- * Version:           1.1.6
+ * Version:           1.1.7
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Michele Chesi
@@ -276,18 +276,30 @@ final class PZP_Plugin_Health {
 
 	/**
 	 * Plugin files that WordPress itself associates with the directory.
-	 * Basis for distinguishing between "closed" and "premium".
+	 * Basis for distinguishing between "closed" and "premium"/self-hosted.
+	 *
+	 * The update_plugins transient is populated not only by WordPress.org's
+	 * own check, but by every third-party update checker that hooks into it
+	 * (e.g. the Plugin Update Checker library this very plugin uses for its
+	 * GitHub-based updates). Genuine wordpress.org entries are identifiable
+	 * by an `id` in the form "w.org/plugins/<slug>" — third-party updaters
+	 * never use that format, so we only count those as "known to wp.org".
 	 */
 	private function slugs_known_to_wporg() {
 		$updates = get_site_transient( 'update_plugins' );
 		$known   = array();
 
 		if ( is_object( $updates ) ) {
-			if ( ! empty( $updates->response ) ) {
-				$known = array_merge( $known, array_keys( (array) $updates->response ) );
-			}
-			if ( ! empty( $updates->no_update ) ) {
-				$known = array_merge( $known, array_keys( (array) $updates->no_update ) );
+			foreach ( array( 'response', 'no_update' ) as $bucket ) {
+				if ( empty( $updates->$bucket ) ) {
+					continue;
+				}
+				foreach ( (array) $updates->$bucket as $file => $entry ) {
+					$id = is_object( $entry ) && isset( $entry->id ) ? $entry->id : '';
+					if ( 0 === strpos( $id, 'w.org/plugins/' ) ) {
+						$known[] = $file;
+					}
+				}
 			}
 		}
 
