@@ -3,7 +3,7 @@
  * Plugin Name:       Plugin-Zustandsprüfung
  * Plugin URI:        https://chesi.net/
  * Description:       Prüft alle installierten Plugins gegen das WordPress.org-Verzeichnis und meldet geschlossene, verwaiste oder lange nicht mehr gepflegte Plugins.
- * Version:           1.1.3
+ * Version:           1.1.4
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Michele Chesi
@@ -128,7 +128,7 @@ final class PZP_Plugin_Health {
 			'stale_months'  => 24,
 			'notice_months' => 12,
 			'email_notify'    => 0,
-			'email_frequency' => 'weekly',
+			'email_frequency' => 'monthly',
 			'email_to'        => get_option( 'admin_email' ),
 		);
 		return wp_parse_args( (array) get_option( self::OPTION, array() ), $defaults );
@@ -505,7 +505,7 @@ final class PZP_Plugin_Health {
 			$this->scan();
 			$redirect = add_query_arg( 'pzp_scanned', '1', admin_url( 'tools.php?page=' . self::SLUG ) );
 		} else {
-			$frequency = sanitize_key( wp_unslash( $_POST['email_frequency'] ?? 'weekly' ) );
+			$frequency = sanitize_key( wp_unslash( $_POST['email_frequency'] ?? 'monthly' ) );
 			if ( ! array_key_exists( $frequency, $this->frequencies() ) ) {
 				$frequency = 'weekly';
 			}
