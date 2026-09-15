@@ -3,7 +3,7 @@
  * Plugin Name:       Plugin-Zustandsprüfung
  * Plugin URI:        https://chesi.net/
  * Description:       Prüft alle installierten Plugins gegen das WordPress.org-Verzeichnis und meldet geschlossene, verwaiste oder lange nicht mehr gepflegte Plugins.
- * Version:           1.1.13
+ * Version:           1.1.14
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Michele Chesi
@@ -33,6 +33,36 @@ if ( file_exists( __DIR__ . '/vendor/plugin-update-checker/plugin-update-checker
 	if ( defined( 'WPHC_GITHUB_TOKEN' ) && WPHC_GITHUB_TOKEN ) {
 		$pzp_update_checker->setAuthentication( WPHC_GITHUB_TOKEN );
 	}
+
+	// Das "Details anzeigen"-Popup speist sich aus der readme.txt (Description,
+	// Installation, Changelog, Upgrade Notice) — die aber nur auf Deutsch
+	// existiert. Liegt für die aktuelle Website-Sprache eine eigene
+	// readme-{locale}.txt im selben Format daneben, wird sie stattdessen
+	// geparst (mit dem ohnehin schon geladenen PucReadmeParser) und ersetzt
+	// diese Abschnitte. Fehlt die Datei (z. B. für Deutsch selbst oder eine
+	// nicht übersetzte Locale), bleibt es beim deutschen Original aus PUC.
+	$pzp_update_checker->addResultFilter(
+		function ( $info ) {
+			$locale = function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale();
+			$file   = __DIR__ . '/readme-' . $locale . '.txt';
+
+			if ( ! file_exists( $file ) || ! class_exists( 'PucReadmeParser' ) ) {
+				return $info;
+			}
+
+			$parser = new PucReadmeParser();
+			$parsed = $parser->parse_readme_contents( file_get_contents( $file ) );
+
+			if ( ! empty( $parsed['sections'] ) ) {
+				$info->sections = array_merge( (array) $info->sections, $parsed['sections'] );
+			}
+			if ( isset( $parsed['upgrade_notice'][ $info->version ] ) ) {
+				$info->upgrade_notice = $parsed['upgrade_notice'][ $info->version ];
+			}
+
+			return $info;
+		}
+	);
 }
 
 final class PZP_Plugin_Health {

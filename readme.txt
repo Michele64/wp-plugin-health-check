@@ -4,7 +4,7 @@ Tags: plugins, wartung, sicherheit, updates
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.13
+Stable tag: 1.1.14
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,6 +31,10 @@ Die Ergebnisse erscheinen direkt als zusätzliche Spalte in der normalen Plugin-
 Updates werden automatisch über das GitHub-Repository bezogen, kein zusätzlicher Update-Server nötig.
 
 == Changelog ==
+
+= 1.1.14 =
+* Das "Details anzeigen"-Popup (Beschreibung, Installation, Changelog, Upgrade-Hinweise) wird jetzt ebenfalls lokalisiert, statt immer die deutsche readme.txt zu zeigen. Dafür liegt je unterstützter Sprache eine eigene readme-{locale}.txt im selben Format bei, die der Update-Checker automatisch passend zur Website-Sprache einliest. Außerdem wird jetzt auch die kurze Beschreibung unter dem Plugin-Namen in der Plugin-Liste übersetzt.
+* Neue Sektion "Upgrade Notice" in der readme.txt ergänzt (gab es bisher gar nicht)
 
 = 1.1.13 =
 * Übersetzungen für Dänisch (da_DK), Italienisch (it_IT) und Französisch (fr_FR) ergänzt
@@ -73,3 +77,14 @@ Updates werden automatisch über das GitHub-Repository bezogen, kein zusätzlich
 * README.md und readme.txt ergänzt
 
 Frühere Versionshinweise (vor dem Umzug auf GitHub) sind nicht mehr im Detail dokumentiert. Ältere Commits sind im [GitHub-Commit-Verlauf](https://github.com/Michele64/wp-plugin-health-check/commits/main) nachvollziehbar.
+
+== Upgrade Notice ==
+
+= 1.1.13 =
+Ergänzt Übersetzungen für Dänisch, Italienisch und Französisch. Kein Handlungsbedarf.
+
+= 1.1.8 =
+Die E-Mail-Benachrichtigung akzeptiert jetzt eine kommagetrennte Liste von Adressen. Wer bisher nur eine einzelne Adresse genutzt hat, muss nichts ändern.
+
+= 1.1.6 =
+Zeigt der Update-Check einen GitHub-403-Fehler, kannst du jetzt WPHC_GITHUB_TOKEN in der wp-config.php setzen, um das zu beheben — Details siehe README des Plugins.
