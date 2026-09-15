@@ -3,7 +3,7 @@
  * Plugin Name:       Plugin-Zustandsprüfung
  * Plugin URI:        https://chesi.net/
  * Description:       Prüft alle installierten Plugins gegen das WordPress.org-Verzeichnis und meldet geschlossene, verwaiste oder lange nicht mehr gepflegte Plugins.
- * Version:           1.1.10
+ * Version:           1.1.11
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Michele Chesi
@@ -549,7 +549,10 @@ final class PZP_Plugin_Health {
 
 		if ( 'scan' === $_POST['pzp_action'] ) {
 			$this->scan();
-			$redirect = add_query_arg( 'pzp_scanned', '1', admin_url( 'tools.php?page=' . self::SLUG ) );
+			// Zeitstempel statt fixem '1', damit die Redirect-URL bei jedem
+			// Scan eindeutig ist -- sonst hält der Browser die zuletzt für
+			// diese (sonst identische) URL gemerkte Scrollposition fest.
+			$redirect = add_query_arg( 'pzp_scanned', (string) time(), admin_url( 'tools.php?page=' . self::SLUG ) );
 		} else {
 			$frequency = sanitize_key( wp_unslash( $_POST['email_frequency'] ?? 'monthly' ) );
 			if ( ! array_key_exists( $frequency, $this->frequencies() ) ) {
@@ -620,14 +623,17 @@ final class PZP_Plugin_Health {
 			<?php if ( isset( $_GET['pzp_scanned'] ) ) : ?>
 				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Prüfung abgeschlossen.', self::TD ); ?></p></div>
 				<script>
-					// Die Ziel-URL nach "Jetzt prüfen" ist bei jedem Aufruf identisch
-					// (?pzp_scanned=1), daher stellt der Browser sonst die zuletzt
-					// gemerkte Scrollposition für genau diese URL wieder her, statt
-					// oben zu landen. Deshalb hier explizit erzwingen.
+					// Manche Browser stellen nach einem Redirect trotzdem eine
+					// gemerkte Scrollposition wieder her (unabhängig von der
+					// eindeutigen URL). Deshalb an mehreren Stellen erzwingen,
+					// auch nach dem vollständigen Laden bzw. mit kurzer Verzögerung.
 					if ( 'scrollRestoration' in history ) {
 						history.scrollRestoration = 'manual';
 					}
-					window.scrollTo( 0, 0 );
+					function pzpScrollTop() { window.scrollTo( 0, 0 ); }
+					pzpScrollTop();
+					window.addEventListener( 'load', pzpScrollTop );
+					setTimeout( pzpScrollTop, 150 );
 				</script>
 			<?php elseif ( isset( $_GET['pzp_saved'] ) ) : ?>
 				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Einstellungen gespeichert.', self::TD ); ?></p></div>

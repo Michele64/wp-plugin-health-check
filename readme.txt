@@ -4,7 +4,7 @@ Tags: plugins, wartung, sicherheit, updates
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.10
+Stable tag: 1.1.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,6 +31,9 @@ Die Ergebnisse erscheinen direkt als zusätzliche Spalte in der normalen Plugin-
 Updates werden automatisch über das GitHub-Repository bezogen, kein zusätzlicher Update-Server nötig.
 
 == Changelog ==
+
+= 1.1.11 =
+* Nachbesserung zu 1.1.10: Scroll-zu-oben nach "Jetzt prüfen" griff nicht zuverlässig, weil er zu früh (vor späterer Browser-eigener Wiederherstellung) ausgeführt wurde. Wird jetzt zusätzlich beim load-Event und mit kurzer Verzögerung erzwungen; die Redirect-URL ist außerdem pro Scan eindeutig (Zeitstempel statt fixem Wert).
 
 = 1.1.10 =
 * Bug behoben: Nach "Jetzt prüfen" landete die Seite an der zuletzt besuchten Scrollposition statt oben beim frischen Report, weil die Redirect-URL bei jedem Scan identisch ist und der Browser dafür seine gemerkte Scrollposition wiederherstellt. Scroll wird jetzt explizit auf den Seitenanfang gesetzt.
