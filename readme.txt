@@ -4,7 +4,7 @@ Tags: plugins, wartung, sicherheit, updates
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.7
+Stable tag: 1.1.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,6 +31,15 @@ Die Ergebnisse erscheinen direkt als zusätzliche Spalte in der normalen Plugin-
 Updates werden automatisch über das GitHub-Repository bezogen, kein zusätzlicher Update-Server nötig.
 
 == Changelog ==
+
+= 1.1.10 =
+* Bug behoben: Nach "Jetzt prüfen" landete die Seite an der zuletzt besuchten Scrollposition statt oben beim frischen Report, weil die Redirect-URL bei jedem Scan identisch ist und der Browser dafür seine gemerkte Scrollposition wiederherstellt. Scroll wird jetzt explizit auf den Seitenanfang gesetzt.
+
+= 1.1.9 =
+* Bug behoben: Nach dem Speichern der Einstellungen sprang die Seite an den Anfang statt zur Einstellungen-Sektion zurückzukehren (Redirect ohne Sprungmarke)
+
+= 1.1.8 =
+* E-Mail-Benachrichtigung unterstützt jetzt mehrere, kommagetrennte Empfängeradressen. Jede Adresse wird einzeln validiert; ungültige Adressen werden beim Speichern verworfen und als Hinweis angezeigt.
 
 = 1.1.7 =
 * Fehlerhafte "Handlungsbedarf"-Meldung für Plugins mit eigenem Update-Checker (z. B. dieses Plugin selbst über GitHub) behoben: Der Abgleich "im WordPress.org-Verzeichnis bekannt" prüfte bisher nur, ob überhaupt ein Eintrag im update_plugins-Transient existiert — der wird aber auch von Drittanbieter-Updatern befüllt, nicht nur von WordPress.org selbst. Jetzt wird zusätzlich das id-Format ("w.org/plugins/…") geprüft, das nur echte wordpress.org-Einträge tragen.

@@ -3,7 +3,7 @@
  * Plugin Name:       Plugin-Zustandsprüfung
  * Plugin URI:        https://chesi.net/
  * Description:       Prüft alle installierten Plugins gegen das WordPress.org-Verzeichnis und meldet geschlossene, verwaiste oder lange nicht mehr gepflegte Plugins.
- * Version:           1.1.7
+ * Version:           1.1.10
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Michele Chesi
@@ -313,6 +313,33 @@ final class PZP_Plugin_Health {
 		return dirname( $file );
 	}
 
+	/**
+	 * Splits a comma-separated string of email addresses, validates each
+	 * one, and returns a comma-separated string of the valid addresses plus
+	 * an array of the ones that were rejected.
+	 *
+	 * @param string $raw
+	 * @return array{0: string, 1: string[]}
+	 */
+	private function sanitize_email_list( $raw ) {
+		$valid   = array();
+		$invalid = array();
+
+		foreach ( explode( ',', (string) $raw ) as $address ) {
+			$address = trim( $address );
+			if ( '' === $address ) {
+				continue;
+			}
+			if ( is_email( $address ) ) {
+				$valid[] = $address;
+			} else {
+				$invalid[] = $address;
+			}
+		}
+
+		return array( implode( ', ', $valid ), $invalid );
+	}
+
 	private function months_since( $date ) {
 		if ( ! $date ) {
 			return null;
@@ -529,16 +556,26 @@ final class PZP_Plugin_Health {
 				$frequency = 'weekly';
 			}
 
+			$email_raw                = wp_unslash( $_POST['email_to'] ?? get_option( 'admin_email' ) );
+			list( $email_to, $email_invalid ) = $this->sanitize_email_list( $email_raw );
+			if ( '' === $email_to ) {
+				$email_to = get_option( 'admin_email' );
+			}
+
 			$settings = array(
 				'stale_months'    => max( 1, absint( $_POST['stale_months'] ?? 24 ) ),
 				'notice_months'   => max( 1, absint( $_POST['notice_months'] ?? 12 ) ),
 				'email_notify'    => empty( $_POST['email_notify'] ) ? 0 : 1,
 				'email_frequency' => $frequency,
-				'email_to'        => sanitize_email( wp_unslash( $_POST['email_to'] ?? get_option( 'admin_email' ) ) ),
+				'email_to'        => $email_to,
 			);
 			update_option( self::OPTION, $settings );
 			$this->sync_cron( $settings );
 			$redirect = add_query_arg( 'pzp_saved', '1', admin_url( 'tools.php?page=' . self::SLUG ) );
+			if ( $email_invalid ) {
+				$redirect = add_query_arg( 'pzp_email_invalid', rawurlencode( implode( ', ', $email_invalid ) ), $redirect );
+			}
+			$redirect .= '#pzp-einstellungen';
 		}
 
 		wp_safe_redirect( $redirect );
@@ -582,8 +619,31 @@ final class PZP_Plugin_Health {
 
 			<?php if ( isset( $_GET['pzp_scanned'] ) ) : ?>
 				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Prüfung abgeschlossen.', self::TD ); ?></p></div>
+				<script>
+					// Die Ziel-URL nach "Jetzt prüfen" ist bei jedem Aufruf identisch
+					// (?pzp_scanned=1), daher stellt der Browser sonst die zuletzt
+					// gemerkte Scrollposition für genau diese URL wieder her, statt
+					// oben zu landen. Deshalb hier explizit erzwingen.
+					if ( 'scrollRestoration' in history ) {
+						history.scrollRestoration = 'manual';
+					}
+					window.scrollTo( 0, 0 );
+				</script>
 			<?php elseif ( isset( $_GET['pzp_saved'] ) ) : ?>
 				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Einstellungen gespeichert.', self::TD ); ?></p></div>
+				<?php if ( ! empty( $_GET['pzp_email_invalid'] ) ) : ?>
+					<div class="notice notice-warning is-dismissible">
+						<p>
+							<?php
+							printf(
+								/* translators: %s: comma-separated list of rejected addresses */
+								esc_html__( 'Folgende E-Mail-Adresse(n) waren ungültig und wurden nicht übernommen: %s', self::TD ),
+								esc_html( wp_unslash( $_GET['pzp_email_invalid'] ) )
+							);
+							?>
+						</p>
+					</div>
+				<?php endif; ?>
 			<?php endif; ?>
 
 			<form method="post" style="margin:1em 0">
@@ -639,10 +699,11 @@ final class PZP_Plugin_Health {
 										</option>
 									<?php endforeach; ?>
 								</select>
-								<input type="email" name="email_to" class="regular-text"
+								<input type="text" name="email_to" class="regular-text" placeholder="<?php esc_attr_e( 'name@example.com, name2@example.com', self::TD ); ?>"
 									value="<?php echo esc_attr( $settings['email_to'] ); ?>">
 							</p>
 							<p class="description">
+								<?php esc_html_e( 'Mehrere Adressen durch Komma trennen.', self::TD ); ?>
 								<?php esc_html_e( 'Die Mail geht nur raus, wenn tatsächlich etwas als „Handlungsbedarf" eingestuft wurde.', self::TD ); ?>
 								<?php if ( $settings['email_notify'] && wp_next_scheduled( self::CRON_HOOK ) ) : ?>
 									<?php echo esc_html( sprintf( __( 'Nächster Lauf: %s.', self::TD ), date_i18n( 'j. F Y, H:i', wp_next_scheduled( self::CRON_HOOK ) ) ) ); ?>
